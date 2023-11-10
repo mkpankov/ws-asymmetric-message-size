@@ -12,10 +12,10 @@ async fn handle_socket(socket: WebSocket) {
     while let Some(r) = receiver.next().await {
         match r {
             Ok(Message::Text(mut text)) => {
-                if text.len() > 8 {
-                    println!("Breaking the loop manually");
-                    break;
-                }
+                // if text.len() > 8 {
+                //     println!("Breaking the loop manually");
+                //     break;
+                // }
                 println!("Replying");
                 text.push('F');
                 sender.send(Message::Text(text)).await.unwrap();
@@ -31,7 +31,8 @@ async fn handle_socket(socket: WebSocket) {
 }
 
 pub async fn handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(|socket| handle_socket(socket))
+    ws.max_message_size(8)
+        .on_upgrade(|socket| handle_socket(socket))
 }
 
 fn ws_router() -> Router {
