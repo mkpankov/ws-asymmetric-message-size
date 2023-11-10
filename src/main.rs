@@ -9,9 +9,21 @@ async fn handle_socket(socket: WebSocket) {
 
     let (mut sender, mut receiver) = socket.split();
 
-    while let Some(Ok(Message::Text(text))) = receiver.next().await {
-        println!("Replying");
-        sender.send(Message::Text(text)).await.unwrap();
+    while let Some(r) = receiver.next().await {
+        match r {
+            Ok(Message::Text(text)) => {
+                if text.len() > 8 {
+                    println!("Breaking the loop manually");
+                    break;
+                }
+                println!("Replying");
+                sender.send(Message::Text(text)).await.unwrap();
+            }
+            Ok(_) => {
+                println!("Unsupported message type");
+            }
+            Err(e) => println!("{e}"),
+        }
     }
 
     println!("Exiting");
