@@ -11,12 +11,13 @@ async fn handle_socket(socket: WebSocket) {
 
     while let Some(r) = receiver.next().await {
         match r {
-            Ok(Message::Text(text)) => {
+            Ok(Message::Text(mut text)) => {
                 if text.len() > 8 {
                     println!("Breaking the loop manually");
                     break;
                 }
                 println!("Replying");
+                text.push('F');
                 sender.send(Message::Text(text)).await.unwrap();
             }
             Ok(_) => {
